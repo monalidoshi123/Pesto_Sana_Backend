@@ -64,6 +64,8 @@ and how to install them.
 
 > JWT_TIMEOUT_DURATION = 3600
 
+> API_TOKEN ="api_token"
+
 4.  Run the backend server
 
 > nodemon start
