@@ -6,7 +6,6 @@ var router = express.Router();
 
 router.post("/register", AuthController.register);
 router.post("/login", AuthController.login);
-router.get("/login", auth.protect, AuthController.auth);
-router.get("/detail/:id", AuthController.detail);
+router.get("/loaduser", auth.protect, AuthController.loaduser);
 
 module.exports = router;

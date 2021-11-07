@@ -100,7 +100,7 @@ exports.register = [
             };
             const secret = process.env.JWT_SECRET_KEY;
             //Generated JWT token with Payload and secret.
-            userData.token = jwt.sign(jwtPayload, secret, jwtData);
+            userData.token = jwt.sign(jwtPayload, secret);
 
             return apiResponse.successResponseWithData(
               res,
@@ -171,7 +171,7 @@ exports.login = [
                   };
                   const secret = process.env.JWT_SECRET_KEY;
                   //Generated JWT token with Payload and secret.
-                  userData.token = jwt.sign(jwtPayload, secret, jwtData);
+                  userData.token = jwt.sign(jwtPayload, secret);
                   return apiResponse.successResponseWithData(
                     res,
                     "Login Success.",
@@ -200,16 +200,15 @@ exports.login = [
 ];
 
 /**
- * User login.
+ * Load User.
  *
  * @param {string}      email
  * @param {string}      password
  *
  * @returns {Object}
  */
-exports.auth = [
+exports.loaduser = [
   async function (req, res) {
-    console.log(req.user._id);
     try {
       UserModel.findById(req.user._id).then((user) => {
         return apiResponse.successResponseWithData(
@@ -219,58 +218,6 @@ exports.auth = [
         );
       });
     } catch (err) {
-      return apiResponse.ErrorResponse(res, err);
-    }
-  },
-];
-
-/**
- * User Detail.
- *
- * @param {string}      id
- *
- * @returns {Object}
- */
-exports.detail = [
-  function (req, res) {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return apiResponse.validationErrorWithData(res);
-    }
-    try {
-      UserModel.findOne({ _id: req.params.id }).then((user) => {
-        if (user !== null) {
-          request(
-            "https://api.waqi.info/feed/" +
-              user.location +
-              "/?token=358a69c811636744996183516009b032ddd74948",
-            function (error, response, body) {
-              if (!error && response.statusCode === 200) {
-                body = JSON.parse(body);
-                let userData = {
-                  _id: user._id,
-                  firstName: user.firstName,
-                  lastName: user.lastName,
-                  email: user.email,
-                  location: user.location,
-                  threshold: user.threshold,
-                };
-                userData.aqi = body.data.aqi;
-                userData["level"] =
-                  body.data.aqi > user.threshold ? "higher" : "lower";
-                return apiResponse.successResponseWithData(
-                  res,
-                  "Operation success",
-                  userData
-                );
-              }
-            }
-          );
-        } else {
-          return apiResponse.notFoundResponse(res);
-        }
-      });
-    } catch (err) {
-      // Throw error in json response with status 500.
       return apiResponse.ErrorResponse(res, err);
     }
   },
